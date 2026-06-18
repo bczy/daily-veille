@@ -1,0 +1,21 @@
+# Expéditeurs de newsletters à synthétiser — une adresse par ligne.
+# Lignes vides et lignes commençant par # sont ignorées.
+# Ce n'est PAS un secret (juste des adresses d'envoi) → committé.
+
+# --- Tech / dev (raccord avec la veille) ---
+sebastien@thisweekinreact.com
+tyler@ui.dev
+jsw@peterc.org
+jakub@reactdigest.net
+jakub@mail.leadershipintech.com
+addyo@substack.com
+informer@daily.dev
+luc@mammouth.ai
+newsletters-noreply@linkedin.com
+
+# --- Hors-tech : décommente si tu veux les inclure (ça diluera une veille tech) ---
+# newsletter@newsletter.liberation.fr
+# lequipe@newsletter.lequipe.fr
+
+# --- Semi : rapport de vulnérabilités de tes projets, décommente si utile ---
+# support-noreply@snyk.io

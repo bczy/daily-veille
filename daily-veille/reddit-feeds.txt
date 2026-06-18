@@ -1,0 +1,5 @@
+# Custom feeds Reddit (multireddits) à synthétiser — une URL par ligne.
+# Lignes vides et # ignorées. Pas un secret → committé.
+# Le feed doit être PUBLIC (sinon l'endpoint .json renvoie 403 et le post est ignoré).
+
+https://www.reddit.com/user/_trambz_/m/ia

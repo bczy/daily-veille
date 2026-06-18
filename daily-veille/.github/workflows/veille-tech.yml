@@ -1,0 +1,76 @@
+name: Veille tech quotidienne
+
+# 06:00 UTC = 08:00 Europe/Paris (CEST). Ajuste si besoin.
+on:
+  schedule:
+    - cron: "0 6 * * 1-5" # lundi → vendredi
+  workflow_dispatch: {} # déclenchement manuel pour tester
+
+permissions:
+  contents: read
+
+jobs:
+  veille:
+    # Envoi depuis ton Gmail → via smtp.gmail.com, joignable depuis un runner
+    # GitHub hébergé. Pas de self-hosted ni de cron local nécessaire.
+    # SMTP_PASS = mot de passe d'application Google (sert aussi à la lecture IMAP).
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Installer Claude Code + dépendances Node
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          npm install nodemailer imapflow mailparser html-to-text
+
+      - name: Récupérer les newsletters (IMAP, lecture seule)
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        run: node scripts/fetch-newsletters.mjs   # écrit newsletters-content.md
+
+      - name: Récupérer les posts Reddit (feeds publics)
+        run: node scripts/fetch-reddit.mjs        # écrit reddit-content.md
+
+      - name: Générer la veille (headless)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          {
+            cat prompts/veille.md
+            echo
+            echo "## Newsletters reçues (à synthétiser dans une section dédiée)"
+            cat newsletters-content.md 2>/dev/null || echo "(aucune)"
+            echo
+            echo "## Posts Reddit (à synthétiser dans une section dédiée)"
+            cat reddit-content.md 2>/dev/null || echo "(aucun)"
+          } > full-prompt.md
+          claude -p "$(cat full-prompt.md)" \
+            --model claude-sonnet-4-6 \
+            --allowedTools "WebSearch" \
+            --output-format text \
+            > veille.md
+          echo "----- aperçu -----"
+          head -n 20 veille.md
+
+      - name: Envoyer par mail
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: bertrand.coizy@edenred.com
+        run: node scripts/send-veille.mjs veille.md
+
+      - name: Archiver la veille du jour
+        uses: actions/upload-artifact@v4
+        with:
+          name: veille-${{ github.run_id }}
+          path: veille.md
+          retention-days: 14

@@ -1,0 +1,17 @@
+{
+  "name": "daily-veille",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Veille tech quotidienne : recherche web + newsletters Gmail, synthèse Claude, envoi SMTP",
+  "scripts": {
+    "newsletters": "node scripts/fetch-newsletters.mjs",
+    "send": "node scripts/send-veille.mjs veille.md"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.14",
+    "imapflow": "^1.0.171",
+    "mailparser": "^3.7.1",
+    "html-to-text": "^9.0.5"
+  }
+}
