@@ -59,6 +59,29 @@ Sur **ton compte Google perso**, tu maîtrises tout :
 `workflow_dispatch` est activé → lance le workflow à la main une fois pour valider
 l'artefact `veille.md` puis l'arrivée du mail, avant de te fier au planning.
 
+## Newsletters (en plus de la veille web)
+
+Le job lit aussi tes newsletters Gmail et les synthétise dans une section dédiée du mail.
+
+- **Aucune auth supplémentaire** : le mot de passe d'application Gmail (`SMTP_PASS`) sert
+  aussi à la lecture IMAP (`imap.gmail.com`). Vérifie juste que l'IMAP est activé :
+  Gmail → Paramètres → Transfert et POP/IMAP → Activer IMAP (souvent déjà actif).
+- **Quels mails ?** Ceux des expéditeurs listés dans `newsletter-senders.txt`
+  (une adresse par ligne, ce n'est pas un secret → committé). Remplis-le avec tes newsletters.
+- Le script `scripts/fetch-newsletters.mjs` récupère les messages de ces expéditeurs reçus
+  sur les dernières 24 h, en extrait le texte, et les passe à la synthèse. S'il n'y a rien
+  (ou en cas d'erreur IMAP), la veille web est générée quand même.
+
+## Reddit (custom feeds)
+
+Le job lit aussi un ou plusieurs custom feeds Reddit (multireddits) et les synthétise.
+
+- **Aucune auth** : les feeds publics ont un endpoint `.json` lu directement.
+- **Quels feeds ?** Ceux listés dans `reddit-feeds.txt` (une URL par ligne, committé).
+  Le script récupère le « top du jour » de chaque feed.
+- ⚠️ Le feed doit être **public**. S'il est privé, l'endpoint renvoie 403 → ignoré
+  proprement (la veille part quand même). Pour un feed privé il faudrait l'API Reddit en OAuth.
+
 ## Bon à savoir
 
 - **Modèle** : `claude-sonnet-4-6` (bon rapport qualité/prix pour une synthèse). ~7 $/mois

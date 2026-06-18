@@ -1,2 +1,7 @@
-.env.*
-
+node_modules/
+.env
+/veille.md
+/newsletters-content.md
+/reddit-content.md
+/full-prompt.md
+*.log
